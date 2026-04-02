@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; margin: 0; background: #f5f5f5; color: #333; }
+    .hidden { display: none; }
+    button { cursor: pointer; padding: 10px 15px; border-radius: 6px; border: none; background: #000; color: #fff; font-weight: bold; }
+    .btn-outline { background: #fff; color: #000; border: 1px solid #000; }
+    .tag-group { display: flex; gap: 8px; margin-bottom: 15px; }
+    .tag { padding: 5px 12px; border: 1px solid #ccc; border-radius: 20px; font-size: 12px; cursor: pointer; background: #fff; }
+    .tag.active { background: #000; color: #fff; border-color: #000; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 60px; }
+    .card { background: #fff; border-radius: 8px; padding: 8px; border: 2px solid transparent; position: relative; }
+    .card.selected { border-color: #007AFF; }
+    .card img { width: 100%; border-radius: 4px; height: 80px; object-fit: cover; }
+    .card-label { font-size: 10px; font-weight: bold; margin-top: 5px; }
+    .doc-link { position: absolute; top: 5px; right: 5px; text-decoration: none; font-size: 12px; }
+    .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px; border-top: 1px solid #ddd; display: flex; justify-content: center; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    label { font-size: 12px; font-weight: bold; display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div id="step-0">
+    <h2>D2C Annotator</h2>
+    <div style="display:flex; gap:10px; flex-direction:column;">
+      <button onclick="showFlow('motion')">Motion Annotation</button>
+      <button class="btn-outline" onclick="showFlow('link')">Link Annotation</button>
+    </div>
+  </div>
+
+  <div id="flow-link" class="hidden">
+    <h3>Add Link</h3>
+    <label>Type</label>
+    <div class="tag-group" id="link-types">
+      <div class="tag active" onclick="setLinkType('URL')">URL</div>
+      <div class="tag" onclick="setLinkType('Video')">Video</div>
+      <div class="tag" onclick="setLinkType('Audio')">Audio</div>
+    </div>
+    <label>Dest.</label>
+    <input type="text" id="link-dest" placeholder="TBD">
+    <label>Indications</label>
+    <textarea id="link-info" rows="3" placeholder="Additional instructions..."></textarea>
+    <button style="width:100%; margin-top:15px;" onclick="addLink()">Add</button>
+  </div>
+
+  <div id="flow-motion-1" class="hidden">
+    <h3>Select Motions (Max 2)</h3>
+    <div class="grid" id="motion-grid">Loading registry...</div>
+    <div class="sticky-bar"><button id="btn-motion-next" onclick="showFlow('motion-2')" disabled>Next</button></div>
+  </div>
+
+  <div id="flow-motion-2" class="hidden">
+    <h3>Motion Details</h3>
+    <label>Speed</label>
+    <div class="tag-group" id="speed-tags">
+      <div class="tag active" data-val="standard">standard</div>
+      <div class="tag" data-val="instant">instant</div>
+      <div class="tag" data-val="fast">fast</div>
+      <div class="tag" data-val="slow">slow</div>
+      <div class="tag" data-val="extra-slow">extra-slow</div>
+    </div>
+    <label>Behavior</label>
+    <div class="tag-group" id="behavior-tags">
+      <div class="tag active" data-val="ease-out-back">ease-out-back</div>
+      <div class="tag" data-val="bounce-standard">bounce-standard</div>
+      <div class="tag" data-val="emphasize">emphasize</div>
+    </div>
+    <label>Indications</label>
+    <textarea id="motion-info" rows="3" placeholder="Additional instructions..."></textarea>
+    <button style="width:100%; margin-top:15px;" onclick="addMotion()">Add</button>
+  </div>
+
+  <div id="step-confirm" class="hidden" style="text-align:center;">
+    <h2 style="color:green;">✅ Added!</h2>
+    <p>Annotation is now in Dev Mode.</p>
+    <button class="btn-outline" onclick="restart()">Restart</button>
+  </div>
+
+  <script>
+    let registry = [];
+    let selectedIntents = [];
+    let currentLinkType = 'URL';
+
+    // Fetch Registry
+    fetch('https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/data/motion-registry.json')
+      .then(res => res.json())
+      .then(data => {
+        registry = data.motions;
+        renderGrid();
+      });
+
+    function renderGrid() {
+      const grid = document.getElementById('motion-grid');
+      grid.innerHTML = registry.map(m => `
+        <div class="card" id="card-${m.id}" onclick="toggleIntent('${m.id}')">
+          ${m.doc_url ? `<a href="${m.doc_url}" target="_blank" class="doc-link">🔗</a>` : ''}
+          <img src="${m.gif_url}" onerror="this.src='https://via.placeholder.com/150?text=No+GIF'">
+          <div class="card-label">${m.label}</div>
+        </div>
+      `).join('');
+    }
+
+    function toggleIntent(id) {
+      const idx = selectedIntents.indexOf(id);
+      if (idx > -1) selectedIntents.splice(idx, 1);
+      else if (selectedIntents.length < 2) selectedIntents.push(id);
+      
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      selectedIntents.forEach(id => document.getElementById(`card-${id}`).classList.add('selected'));
+      document.getElementById('btn-motion-next').disabled = selectedIntents.length === 0;
+    }
+
+    // Generic tag selection logic
+    document.querySelectorAll('.tag-group').forEach(group => {
+      group.addEventListener('click', e => {
+        if(e.target.classList.contains('tag')) {
+          group.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+        }
+      });
+    });
+
+    function setLinkType(type) { currentLinkType = type; }
+
+    function showFlow(flow) {
+      document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
+      if(flow === 'motion') document.getElementById('flow-motion-1').classList.remove('hidden');
+      if(flow === 'motion-2') document.getElementById('flow-motion-2').classList.remove('hidden');
+      if(flow === 'link') document.getElementById('flow-link').classList.remove('hidden');
+    }
+
+    function addLink() {
+      const dest = document.getElementById('link-dest').value || 'TBD';
+      const info = document.getElementById('link-info').value;
+      parent.postMessage({ pluginMessage: { type: 'add-link', data: { type: currentLinkType, dest, info } } }, '*');
+      showFlow('confirm');
+    }
+
+    function addMotion() {
+      const speed = document.querySelector('#speed-tags .active').dataset.val;
+      const behavior = document.querySelector('#behavior-tags .active').dataset.val;
+      const info = document.getElementById('motion-info').value;
+      parent.postMessage({ pluginMessage: { type: 'add-motion', data: { intents: selectedIntents, speed, behavior, info } } }, '*');
+      showFlow('confirm');
+    }
+
+    function restart() {
+      selectedIntents = [];
+      document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+      showFlow('0');
+      document.getElementById('step-0').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

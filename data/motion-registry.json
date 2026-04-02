@@ -1,0 +1,200 @@
+{
+  "motions": [
+    {
+      "//": "--- SPEED TOKENS ---",
+      "id": "motion-standard",
+      "label": "Speed: Standard",
+      "description": "Default system transition (300ms).",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/motion-standard.gif",
+      "doc_url": null
+    },
+    {
+      "id": "motion-instant",
+      "label": "Speed: Instant",
+      "description": "Near-instant feedback (50ms) for active states.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/motion-instant.gif",
+      "doc_url": null
+    },
+    {
+      "id": "motion-fast",
+      "label": "Speed: Fast",
+      "description": "Quick feedback (150ms) for icons and tooltips.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/motion-fast.gif",
+      "doc_url": null
+    },
+    {
+      "id": "motion-slow",
+      "label": "Speed: Slow",
+      "description": "Standard duration (500ms) for cards and menus.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/motion-slow.gif",
+      "doc_url": null
+    },
+    {
+      "id": "motion-extra-slow",
+      "label": "Speed: Extra Slow",
+      "description": "Long duration (1000ms) for layout changes.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/motion-extra-slow.gif",
+      "doc_url": null
+    },
+
+    {
+      "//": "--- BEHAVIOR TOKENS ---",
+      "id": "ease-out-back",
+      "label": "Behavior: Pop Out",
+      "description": "Slight overshoot effect for buttons.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/ease-out-back.gif",
+      "doc_url": null
+    },
+    {
+      "id": "bounce-standard",
+      "label": "Behavior: Bounce",
+      "description": "Elastic bounce for playful interactions.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/bounce-standard.gif",
+      "doc_url": null
+    },
+    {
+      "id": "emphasize",
+      "label": "Behavior: Emphasize",
+      "description": "Strong easing to draw attention to an element.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/emphasize.gif",
+      "doc_url": null
+    },
+
+    {
+      "//": "--- UI INTENT TOKENS ---",
+      "id": "fade-in",
+      "label": "Intent: Fade In",
+      "description": "Simple opacity transition.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/fade-in.gif",
+      "doc_url": null
+    },
+    {
+      "id": "slide-up",
+      "label": "Intent: Slide Up",
+      "description": "Quick entry from bottom to top.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/slide-up.gif",
+      "doc_url": null
+    },
+    {
+      "id": "slide-down",
+      "label": "Intent: Slide Down",
+      "description": "Quick entry from top to bottom.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/slide-down.gif",
+      "doc_url": null
+    },
+    {
+      "id": "modal-entry",
+      "label": "Intent: Modal Entry",
+      "description": "Smooth scale-up and fade-in for overlays.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/modal-entry.gif",
+      "doc_url": null
+    },
+    {
+      "id": "drawer-slide",
+      "label": "Intent: Drawer Slide",
+      "description": "Lateral slide entry for side panels.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/drawer-slide.gif",
+      "doc_url": null
+    },
+
+    {
+      "//": "--- GSAP ORCHESTRATION TOKENS ---",
+      "id": "card-stack",
+      "label": "GSAP: Card Stack",
+      "description": "Stacked cards with rotation on scroll.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/card-stack.gif",
+      "doc_url": "https://demos.gsap.com/demo/card-stack"
+    },
+    {
+      "id": "infinite-card-slider",
+      "label": "GSAP: Infinite Slider",
+      "description": "Seamless infinite loop of rotating cards.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/infinite-card-slider.gif",
+      "doc_url": "https://demos.gsap.com/demo/infinite-card-slider"
+    },
+    {
+      "id": "responsive-line-splits",
+      "label": "GSAP: Line Splits",
+      "description": "Text lines split and reveal on scroll.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/responsive-line-splits-on-scroll.gif",
+      "doc_url": "https://demos.gsap.com/demo/responsive-line-splits-on-scroll"
+    },
+    {
+      "id": "text-masking",
+      "label": "GSAP: Text Masking",
+      "description": "Visual masking of text over dynamic backgrounds.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/text-masking.gif",
+      "doc_url": "https://demos.gsap.com/demo/text-masking"
+    },
+    {
+      "id": "direction-aware-header",
+      "label": "GSAP: Aware Header",
+      "description": "Header that reacts to scroll direction.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/directionally-aware-header.gif",
+      "doc_url": "https://demos.gsap.com/demo/directionally-aware-header"
+    },
+    {
+      "id": "pinned-panels",
+      "label": "GSAP: Pinned Panels",
+      "description": "Panels that pin during scroll movement.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/pinned-panels-with-overscroll.gif",
+      "doc_url": "https://demos.gsap.com/demo/pinned-panels-with-overscroll"
+    },
+    {
+      "id": "flip-carousel",
+      "label": "GSAP: Flip Carousel",
+      "description": "High-performance carousel using GSAP Flip.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/flip-carousel.gif",
+      "doc_url": "https://demos.gsap.com/demo/flip-carousel"
+    },
+    {
+      "id": "text-replacement",
+      "label": "GSAP: Text Replace",
+      "description": "Smooth sequential replacement of words.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/animate-text-replacement.gif",
+      "doc_url": "https://demos.gsap.com/demo/animate-text-replacement"
+    },
+    {
+      "id": "text-scrambling",
+      "label": "GSAP: Scramble Text",
+      "description": "Hacker-style text reveal effect.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/text-scrambling.gif",
+      "doc_url": "https://demos.gsap.com/demo/text-scrambling"
+    },
+    {
+      "id": "animate-text",
+      "label": "GSAP: Text Reveal",
+      "description": "Staggered letter or character entrance.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/animate-text.gif",
+      "doc_url": "https://demos.gsap.com/demo/animate-text"
+    },
+    {
+      "id": "animate-scroll-position",
+      "label": "GSAP: Scroll Anchor",
+      "description": "Smooth scrolling to specific layout anchors.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/animate-scroll-position.gif",
+      "doc_url": "https://demos.gsap.com/demo/animate-scroll-position"
+    },
+    {
+      "id": "directional-marquee",
+      "label": "GSAP: Marquee",
+      "description": "Marquee that adapts speed to scroll.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/directional-marquee.gif",
+      "doc_url": "https://demos.gsap.com/demo/directional-marquee"
+    },
+    {
+      "id": "horizontal-scroll-gallery",
+      "label": "GSAP: Horizontal Gallery",
+      "description": "Section-based horizontal scroll gallery.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/horizontal-scrolling-gallery.gif",
+      "doc_url": "https://demos.gsap.com/demo/horizontal-scrolling-gallery"
+    },
+    {
+      "id": "smooth-scrolling",
+      "label": "GSAP: Smooth Scroll",
+      "description": "Global smooth scroll (Lenis) initialization.",
+      "gif_url": "https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/assets/motions/smooth-scrolling.gif",
+      "doc_url": "https://demos.gsap.com/demo/smooth-scrolling/"
+    }
+  ]
+}

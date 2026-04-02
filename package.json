@@ -1,0 +1,27 @@
+{
+  "name": "d2c-annotation-figma-plugin",
+  "version": "1.0.0",
+  "description": "Plugin d'annotation pour l'écosystème **Straxy Factory**. Permet aux designers d'injecter des intentions de mouvement (Motion Intent) et des liens/médias directement dans les éléments Figma via le Dev Mode.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StraxyCo/d2c-annotation-figma-plugin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/StraxyCo/d2c-annotation-figma-plugin/issues"
+  },
+  "homepage": "https://github.com/StraxyCo/d2c-annotation-figma-plugin#readme",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.124.0",
+    "install": "^0.13.0",
+    "typescript": "^6.0.2",
+    "typescriptnpm": "^1.0.1"
+  }
+}
