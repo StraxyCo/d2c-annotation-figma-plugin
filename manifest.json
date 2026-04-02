@@ -1,13 +1,12 @@
 {
   "name": "Straxy D2C Annotator",
-  "id": "straxy-d2c-annotator",
+  "id": "YOUR_NUMERIC_ID",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "capabilities": [],
-  "enableProposedApi": false,
-  "editorType": ["figma"],
-  "networkAccess": {
-    "allowedDomains": ["https://raw.githubusercontent.com"]
-  }
+  "capabilities": ["inspect"],
+  "editorType": ["figma", "dev"],
+  "relaunchButtons": [
+    { "command": "view_spec", "name": "D2C Spec" }
+  ]
 }
