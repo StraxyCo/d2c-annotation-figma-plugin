@@ -3,56 +3,75 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: sans-serif; padding: 20px; margin: 0; background: #f5f5f5; color: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 15px; margin: 0; background: #ffffff; color: #333; font-size: 12px; }
     .hidden { display: none; }
-    button { cursor: pointer; padding: 10px 15px; border-radius: 6px; border: none; background: #000; color: #fff; font-weight: bold; }
-    .btn-outline { background: #fff; color: #000; border: 1px solid #000; }
-    .tag-group { display: flex; gap: 8px; margin-bottom: 15px; }
-    .tag { padding: 5px 12px; border: 1px solid #ccc; border-radius: 20px; font-size: 12px; cursor: pointer; background: #fff; }
-    .tag.active { background: #000; color: #fff; border-color: #000; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 60px; }
-    .card { background: #fff; border-radius: 8px; padding: 8px; border: 2px solid transparent; position: relative; }
-    .card.selected { border-color: #007AFF; }
-    .card img { width: 100%; border-radius: 4px; height: 80px; object-fit: cover; }
-    .card-label { font-size: 10px; font-weight: bold; margin-top: 5px; }
-    .doc-link { position: absolute; top: 5px; right: 5px; text-decoration: none; font-size: 12px; }
-    .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px; border-top: 1px solid #ddd; display: flex; justify-content: center; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-    label { font-size: 12px; font-weight: bold; display: block; margin-top: 10px; }
+    h2 { font-size: 16px; margin-bottom: 15px; }
+    h3 { font-size: 14px; margin: 15px 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    
+    /* Buttons */
+    button { cursor: pointer; padding: 10px 15px; border-radius: 6px; border: none; background: #181818; color: #fff; font-weight: 600; width: 100%; transition: opacity 0.2s; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-outline { background: #fff; color: #181818; border: 1px solid #181818; margin-top: 8px; }
+    
+    /* Tags */
+    .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .tag { padding: 4px 10px; border: 1px solid #e0e0e0; border-radius: 4px; cursor: pointer; background: #fafafa; font-size: 11px; }
+    .tag.active { background: #181818; color: #fff; border-color: #181818; }
+    
+    /* Grid & Cards */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 70px; }
+    .card { background: #fff; border-radius: 6px; padding: 6px; border: 1px solid #eee; position: relative; cursor: pointer; transition: all 0.2s; }
+    .card:hover { border-color: #aaa; }
+    .card.selected { border-color: #007AFF; background: #F0F7FF; box-shadow: 0 0 0 1px #007AFF; }
+    .card img { width: 100%; border-radius: 3px; height: 70px; object-fit: cover; background: #f0f0f0; }
+    .card-label { font-size: 10px; font-weight: 600; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-link { position: absolute; top: 4px; right: 4px; text-decoration: none; font-size: 12px; background: rgba(255,255,255,0.8); border-radius: 3px; width: 16px; height: 16px; text-align: center; }
+    
+    /* Inputs */
+    input, textarea { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 11px; }
+    label { font-size: 11px; font-weight: 700; display: block; margin-top: 12px; color: #666; }
+    
+    /* Layout */
+    .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 12px; border-top: 1px solid #eee; display: flex; justify-content: center; z-index: 100; }
+    #error-display { color: #d93025; background: #fde8e8; padding: 10px; border-radius: 4px; font-size: 11px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
+
   <div id="step-0">
-    <h2>D2C Annotator</h2>
-    <div style="display:flex; gap:10px; flex-direction:column;">
-      <button onclick="showFlow('motion')">Motion Annotation</button>
-      <button class="btn-outline" onclick="showFlow('link')">Link Annotation</button>
-    </div>
+    <h2>Straxy Annotator</h2>
+    <p style="color:#666; margin-bottom:20px;">Select annotation type:</p>
+    <button onclick="showFlow('motion')">Motion Intent</button>
+    <button class="btn-outline" onclick="showFlow('link')">Link & Media</button>
   </div>
 
   <div id="flow-link" class="hidden">
-    <h3>Add Link</h3>
+    <h3>🔗 Link / Media Intent</h3>
     <label>Type</label>
     <div class="tag-group" id="link-types">
       <div class="tag active" onclick="setLinkType('URL')">URL</div>
       <div class="tag" onclick="setLinkType('Video')">Video</div>
       <div class="tag" onclick="setLinkType('Audio')">Audio</div>
     </div>
-    <label>Dest.</label>
-    <input type="text" id="link-dest" placeholder="TBD">
-    <label>Indications</label>
-    <textarea id="link-info" rows="3" placeholder="Additional instructions..."></textarea>
-    <button style="width:100%; margin-top:15px;" onclick="addLink()">Add</button>
+    <label>Dest. (URL or TBD)</label>
+    <input type="text" id="link-dest" placeholder="Leave empty for TBD">
+    <label>Indications (Optional)</label>
+    <textarea id="link-info" rows="3" placeholder="Specific notes for the developer..."></textarea>
+    <button style="margin-top:20px;" onclick="addLink()">Add Annotation</button>
+    <button class="btn-outline" onclick="restart()">Cancel</button>
   </div>
 
   <div id="flow-motion-1" class="hidden">
-    <h3>Select Motions (Max 2)</h3>
+    <h3>🎬 Select Intents (Max 2)</h3>
+    <div id="error-display" class="hidden"></div>
     <div class="grid" id="motion-grid">Loading registry...</div>
-    <div class="sticky-bar"><button id="btn-motion-next" onclick="showFlow('motion-2')" disabled>Next</button></div>
+    <div class="sticky-bar">
+      <button id="btn-motion-next" onclick="showFlow('motion-2')" disabled>Next Step</button>
+    </div>
   </div>
 
   <div id="flow-motion-2" class="hidden">
-    <h3>Motion Details</h3>
+    <h3>⚙️ Motion Properties</h3>
     <label>Speed</label>
     <div class="tag-group" id="speed-tags">
       <div class="tag active" data-val="standard">standard</div>
@@ -67,36 +86,54 @@
       <div class="tag" data-val="bounce-standard">bounce-standard</div>
       <div class="tag" data-val="emphasize">emphasize</div>
     </div>
-    <label>Indications</label>
-    <textarea id="motion-info" rows="3" placeholder="Additional instructions..."></textarea>
-    <button style="width:100%; margin-top:15px;" onclick="addMotion()">Add</button>
+    <label>Indications (Optional)</label>
+    <textarea id="motion-info" rows="3" placeholder="Notes (ex: delay, trigger points)..."></textarea>
+    <button style="margin-top:20px;" onclick="addMotion()">Add Annotation</button>
+    <button class="btn-outline" onclick="showFlow('motion')">Back</button>
   </div>
 
-  <div id="step-confirm" class="hidden" style="text-align:center;">
-    <h2 style="color:green;">✅ Added!</h2>
-    <p>Annotation is now in Dev Mode.</p>
-    <button class="btn-outline" onclick="restart()">Restart</button>
+  <div id="step-confirm" class="hidden" style="text-align:center; padding-top:40px;">
+    <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+    <h2>Annotation Added!</h2>
+    <p style="color:#666;">The intent is now stored in Dev Mode.</p>
+    <button class="btn-outline" style="width: auto; padding: 10px 30px;" onclick="restart()">Restart</button>
   </div>
 
   <script>
+    alert("Script UI lancé !");
     let registry = [];
     let selectedIntents = [];
     let currentLinkType = 'URL';
 
-    // Fetch Registry
-    fetch('https://github.com/StraxyCo/d2c-annotation-figma-plugin/blob/cb6c270774dbbd415e234e7fe6bb95aa336c3fbb/data/motion-registry.json')
-      .then(res => res.json())
+    const registryUrl = 'https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/data/motion-registry.json';
+
+    // ROBUST FETCH LOGIC
+    console.log("🚀 Fetching registry from:", registryUrl);
+    fetch(registryUrl)
+      .then(res => {
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+        return res.json();
+      })
       .then(data => {
+        if (!data.motions) throw new Error("Invalid JSON: 'motions' array not found.");
         registry = data.motions;
         renderGrid();
+        console.log("✅ Registry loaded");
+      })
+      .catch(err => {
+        console.error("❌ Registry error:", err);
+        const errDiv = document.getElementById('error-display');
+        errDiv.innerHTML = `<b>Error:</b> ${err.message}<br>Verify the repo is PUBLIC.`;
+        errDiv.classList.remove('hidden');
+        document.getElementById('motion-grid').innerHTML = "";
       });
 
     function renderGrid() {
       const grid = document.getElementById('motion-grid');
       grid.innerHTML = registry.map(m => `
         <div class="card" id="card-${m.id}" onclick="toggleIntent('${m.id}')">
-          ${m.doc_url ? `<a href="${m.doc_url}" target="_blank" class="doc-link">🔗</a>` : ''}
-          <img src="${m.gif_url}" onerror="this.src='https://via.placeholder.com/150?text=No+GIF'">
+          ${m.doc_url ? `<a href="${m.doc_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">🔗</a>` : ''}
+          <img src="${m.gif_url}" onerror="this.src='https://via.placeholder.com/150?text=No+Preview'">
           <div class="card-label">${m.label}</div>
         </div>
       `).join('');
@@ -104,33 +141,49 @@
 
     function toggleIntent(id) {
       const idx = selectedIntents.indexOf(id);
-      if (idx > -1) selectedIntents.splice(idx, 1);
-      else if (selectedIntents.length < 2) selectedIntents.push(id);
+      if (idx > -1) {
+        selectedIntents.splice(idx, 1);
+      } else if (selectedIntents.length < 2) {
+        selectedIntents.push(id);
+      }
       
       document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-      selectedIntents.forEach(id => document.getElementById(`card-${id}`).classList.add('selected'));
+      selectedIntents.forEach(id => {
+        const el = document.getElementById(`card-${id}`);
+        if(el) el.classList.add('selected');
+      });
       document.getElementById('btn-motion-next').disabled = selectedIntents.length === 0;
     }
 
-    // Generic tag selection logic
+    // Link Type Logic
+    function setLinkType(type) {
+      currentLinkType = type;
+      document.querySelectorAll('#link-types .tag').forEach(t => {
+        t.classList.toggle('active', t.innerText === type);
+      });
+    }
+
+    // Flow Management
+    function showFlow(flow) {
+      document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
+      if (flow === '0') document.getElementById('step-0').classList.remove('hidden');
+      if (flow === 'link') document.getElementById('flow-link').classList.remove('hidden');
+      if (flow === 'motion') document.getElementById('flow-motion-1').classList.remove('hidden');
+      if (flow === 'motion-2') document.getElementById('flow-motion-2').classList.remove('hidden');
+      if (flow === 'confirm') document.getElementById('step-confirm').classList.remove('hidden');
+    }
+
+    // Tag Switcher (Speed/Behavior)
     document.querySelectorAll('.tag-group').forEach(group => {
       group.addEventListener('click', e => {
-        if(e.target.classList.contains('tag')) {
+        if(e.target.classList.contains('tag') && group.id !== 'link-types') {
           group.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
           e.target.classList.add('active');
         }
       });
     });
 
-    function setLinkType(type) { currentLinkType = type; }
-
-    function showFlow(flow) {
-      document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
-      if(flow === 'motion') document.getElementById('flow-motion-1').classList.remove('hidden');
-      if(flow === 'motion-2') document.getElementById('flow-motion-2').classList.remove('hidden');
-      if(flow === 'link') document.getElementById('flow-link').classList.remove('hidden');
-    }
-
+    // Actions
     function addLink() {
       const dest = document.getElementById('link-dest').value || 'TBD';
       const info = document.getElementById('link-info').value;
@@ -148,9 +201,11 @@
 
     function restart() {
       selectedIntents = [];
+      currentLinkType = 'URL';
       document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('btn-motion-next').disabled = true;
       showFlow('0');
-      document.getElementById('step-0').classList.remove('hidden');
     }
   </script>
 </body>
