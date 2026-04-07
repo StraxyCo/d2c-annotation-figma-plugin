@@ -4,59 +4,59 @@ figma.showUI(__html__, { width: 340, height: 550 });
 figma.ui.onmessage = async (msg) => {
     const selection = figma.currentPage.selection;
     if (selection.length === 0)
-        return figma.notify("❌ Select a layer");
-    const node = selection[0];
-    // --- NEW: CLEAR DATA HANDLER ---
+        return figma.notify("❌ Select at least one element.");
+    // --- BULK CLEAR HANDLER ---
     if (msg.type === 'clear-data') {
-        try {
-            // 1. Wipe Shared Plugin Data
+        for (const node of selection) {
             node.setSharedPluginData("d2c", "intents", "");
-            // 2. Remove Relaunch Button from Sidebar
             node.setRelaunchData({});
-            figma.notify("🗑️ All annotations cleared for this layer");
-            console.log(`Cleared all D2C data for: ${node.name}`);
         }
-        catch (e) {
-            figma.notify("❌ Failed to clear data");
-        }
+        figma.notify(`🗑️ Cleared all annotations`);
         return;
     }
-    // --- EXISTING ANNOTATION LOGIC ---
-    const applyAnnotation = (content, type) => {
-        try {
-            const existingRaw = node.getSharedPluginData("d2c", "intents");
-            let allIntents = {};
-            if (existingRaw) {
-                try {
-                    allIntents = JSON.parse(existingRaw);
+    // --- REFINED BULK APPLY LOGIC ---
+    const applyAnnotationToAll = (content, intentSlot) => {
+        let successCount = 0;
+        for (const node of selection) {
+            try {
+                const existingRaw = node.getSharedPluginData("d2c", "intents");
+                let allIntents = {};
+                if (existingRaw) {
+                    try {
+                        allIntents = JSON.parse(existingRaw);
+                    }
+                    catch (e) {
+                        allIntents = {};
+                    }
                 }
-                catch (e) {
-                    allIntents = {};
-                }
+                // Use distinct keys: 'link', 'media', or 'motion'
+                allIntents[intentSlot] = content;
+                const finalPayload = JSON.stringify(allIntents);
+                node.setSharedPluginData("d2c", "intents", finalPayload);
+                // Update Sidebar Summary
+                const summaryParts = Object.entries(allIntents).map(([t, s]) => `${t.toUpperCase()}: ${s}`);
+                const displaySummary = summaryParts.join(" | ").substring(0, 147);
+                node.setRelaunchData({ view_spec: displaySummary });
+                successCount++;
             }
-            allIntents[type.toLowerCase()] = content;
-            const finalPayload = JSON.stringify(allIntents);
-            node.setSharedPluginData("d2c", "intents", finalPayload);
-            const summaryParts = Object.entries(allIntents).map(([t, s]) => `${t.toUpperCase()}: ${s}`);
-            const fullSummary = summaryParts.join(" | ");
-            const displaySummary = fullSummary.length > 150 ? fullSummary.substring(0, 147) + "..." : fullSummary;
-            node.setRelaunchData({ view_spec: displaySummary });
-            return true;
+            catch (err) {
+                console.error(err);
+            }
         }
-        catch (e) {
-            return false;
-        }
+        return successCount;
     };
     if (msg.type === 'add-link') {
-        const { dest, info } = msg.data;
+        const { type, dest, info } = msg.data;
         const spec = `${dest}${info ? ` (${info})` : ''}`;
-        if (applyAnnotation(spec, "Link"))
-            figma.notify("✅ Link Saved");
+        // ROUTING LOGIC: Distinguish between navigation and media
+        const intentSlot = (type === 'Video' || type === 'Audio') ? 'media' : 'link';
+        const count = applyAnnotationToAll(spec, intentSlot);
+        figma.notify(`✅ ${type} intent saved to ${count} elements`);
     }
     if (msg.type === 'add-motion') {
         const { intents, speed } = msg.data;
         const spec = `${intents.join(', ')} (${speed})`;
-        if (applyAnnotation(spec, "Motion"))
-            figma.notify("✅ Motion Saved");
+        const count = applyAnnotationToAll(spec, "motion");
+        figma.notify(`✅ Motion saved to ${count} elements`);
     }
 };
