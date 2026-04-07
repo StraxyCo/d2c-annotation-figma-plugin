@@ -1,6 +1,6 @@
 {
   "name": "Straxy D2C Annotator",
-  "id": "1623306734532692671"
+  "id": "1623306734532692671",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
