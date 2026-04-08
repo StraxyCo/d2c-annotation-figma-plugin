@@ -17,7 +17,7 @@ figma.ui.onmessage = async (msg: any) => {
   }
 
   // --- BULK APPLY LOGIC ---
-  // content accepts string (link, media, motion) or object (data)
+  // content accepts string (link, media, motion), or object (data, css)
   const applyAnnotationToAll = (content: string | object, intentSlot: string) => {
     let successCount = 0;
     for (const node of selection) {
@@ -32,11 +32,15 @@ figma.ui.onmessage = async (msg: any) => {
 
         node.setSharedPluginData("d2c", "intents", JSON.stringify(allIntents));
 
-        // Sidebar summary — guard against [object Object] for data intents
+        // Sidebar summary — typed display per intent slot
         const summaryParts = Object.entries(allIntents).map(([t, s]) => {
           const display =
             typeof s === 'object' && s !== null
-              ? `[dataset: ${(s as any).label || 'unnamed'}]`
+              ? t === 'data'
+                ? `[dataset: ${(s as any).label || 'unnamed'}]`
+                : t === 'css'
+                ? `[css: ${Object.keys(s as object).length} rule(s)]`
+                : `[object]`
               : String(s);
           return `${t.toUpperCase()}: ${display}`;
         });
@@ -57,7 +61,7 @@ figma.ui.onmessage = async (msg: any) => {
     figma.notify(`✅ ${type} intent saved to ${count} elements`);
   }
 
-  // --- MOTION HANDLER (FIXED: behavior + info now included in spec) ---
+  // --- MOTION HANDLER (behavior + info included in spec) ---
   if (msg.type === 'add-motion') {
     const { intents, speed, behavior, info } = msg.data;
     const parts = [`${intents.join(', ')}`, `${speed}/${behavior}`];
@@ -73,7 +77,6 @@ figma.ui.onmessage = async (msg: any) => {
   if (msg.type === 'detect-fields') {
     const node = selection[0];
 
-    // Navigate to master component for reliable canonical structure
     const target: SceneNode =
       node.type === 'INSTANCE' && (node as InstanceNode).mainComponent
         ? (node as InstanceNode).mainComponent!
@@ -85,7 +88,7 @@ figma.ui.onmessage = async (msg: any) => {
     const traverse = (n: SceneNode) => {
       const name = n.name.trim();
 
-      // Label/* → text content field (snake_case from label name)
+      // Label/* → text content field (snake_case)
       if (name.startsWith('Label/')) {
         const raw = name.slice('Label/'.length).toLowerCase().replace(/[\s\-\/]+/g, '_');
         if (raw && !seen.has(raw)) { fields.push(raw); seen.add(raw); }
@@ -99,7 +102,6 @@ figma.ui.onmessage = async (msg: any) => {
         if (fieldName && !seen.has(fieldName)) { fields.push(fieldName); seen.add(fieldName); }
       }
 
-      // Recurse into children
       if ('children' in n) {
         for (const child of (n as ChildrenMixin).children) traverse(child);
       }
@@ -107,9 +109,7 @@ figma.ui.onmessage = async (msg: any) => {
 
     traverse(target);
 
-    // Suggested label: strip category prefix from component name
     const componentName = target.name.replace(/^(Section|Molecule|Atom)\//, '').replace(/\//g, ' ');
-
     figma.ui.postMessage({ type: 'fields-detected', fields, componentName });
   }
 
@@ -131,5 +131,34 @@ figma.ui.onmessage = async (msg: any) => {
 
     const count = applyAnnotationToAll(dataIntent, "data");
     figma.notify(`✅ Data schema "${dataIntent.label}" (${dataIntent.fields.length} fields) saved to ${count} elements`);
+  }
+
+  // --- CSS OVERRIDE HANDLER ---
+  // Stores a { property: value } object under d2c/intents > 'css' key.
+  // Used for CSS values that cannot be expressed natively in Figma (e.g. 50%, flex: 1, aspect-ratio).
+  // Expected msg.data: { rules: { [property: string]: string } }
+  if (msg.type === 'add-css') {
+    const { rules } = msg.data;
+
+    if (!rules || Object.keys(rules).length === 0) {
+      figma.notify("❌ CSS Override requires at least one property.");
+      return;
+    }
+
+    // Clean keys and values
+    const cleaned: Record<string, string> = {};
+    for (const [prop, val] of Object.entries(rules)) {
+      const cleanProp = prop.trim();
+      const cleanVal = (val as string).trim();
+      if (cleanProp && cleanVal) cleaned[cleanProp] = cleanVal;
+    }
+
+    if (Object.keys(cleaned).length === 0) {
+      figma.notify("❌ No valid CSS rules found.");
+      return;
+    }
+
+    const count = applyAnnotationToAll(cleaned, "css");
+    figma.notify(`✅ ${Object.keys(cleaned).length} CSS rule(s) saved to ${count} elements`);
   }
 };

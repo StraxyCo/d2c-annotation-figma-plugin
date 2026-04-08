@@ -6,7 +6,7 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 15px; margin: 0; background: #fff; color: #333; font-size: 12px; }
     .hidden { display: none; }
     h2 { font-size: 15px; font-weight: 700; margin-bottom: 15px; }
-    
+
     button { cursor: pointer; padding: 10px 15px; border-radius: 6px; border: none; background: #181818; color: #fff; font-weight: 600; width: 100%; }
     button:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; }
     .btn-secondary { background: #fff; color: #181818; border: 1px solid #ddd; margin-top: 8px; }
@@ -25,9 +25,9 @@
     .card.selected { border-color: #007AFF; background: #F0F7FF; box-shadow: 0 0 0 1px #007AFF; }
     .card img { width: 100%; border-radius: 3px; height: 75px; object-fit: cover; background: #f0f0f0; display: block; }
     .card-label { font-size: 10px; font-weight: 600; margin-top: 5px; text-align: center; }
-    
+
     .sticky-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 12px; border-top: 1px solid #eee; display: flex; gap: 10px; z-index: 100; }
-    
+
     textarea, input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; margin-top: 5px; box-sizing: border-box; }
     hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
 
@@ -40,6 +40,13 @@
     .add-field-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
     .add-field-row input { margin-top: 0; flex: 1; }
     .add-field-row button { width: auto; padding: 7px 12px; font-size: 11px; flex-shrink: 0; }
+
+    /* CSS Override rows */
+    .css-row { display: flex; gap: 6px; margin-top: 6px; align-items: center; }
+    .css-row input { margin-top: 0; flex: 1; }
+    .css-row .sep { color: #bbb; font-size: 12px; flex-shrink: 0; }
+    .css-row .remove-css { cursor: pointer; color: #bbb; font-size: 16px; line-height: 1; flex-shrink: 0; padding: 0 2px; }
+    .css-row .remove-css:hover { color: #f24822; }
   </style>
 </head>
 <body>
@@ -50,6 +57,7 @@
     <button onclick="showFlow('motion')">Motion Intent</button>
     <button class="btn-secondary" onclick="showFlow('link')">Link & Media</button>
     <button class="btn-secondary" onclick="showFlow('data')">Data Injection</button>
+    <button class="btn-secondary" onclick="showFlow('css')">CSS Override</button>
     <hr>
     <button class="btn-danger" onclick="clearData()">Clear All Annotations</button>
   </div>
@@ -136,6 +144,30 @@
     </div>
   </div>
 
+  <!-- FLOW : CSS Override -->
+  <div id="flow-css" class="hidden">
+    <h2>🎨 CSS Override</h2>
+    <p style="color:#888; font-size:11px; margin-top:-8px; margin-bottom:12px;">
+      Propriétés CSS non exprimables dans Figma (ex. width: 50%, flex: 1, aspect-ratio: 16/9).
+    </p>
+
+    <label>Propriétés</label>
+    <div id="css-rows-container">
+      <!-- Rows injected dynamically -->
+    </div>
+
+    <button class="btn-detect" onclick="addCssRow()" style="margin-top: 10px; width: auto; padding: 7px 14px;">
+      + Ajouter une propriété
+    </button>
+
+    <div style="margin-bottom: 80px;"></div>
+
+    <div class="sticky-footer">
+      <button class="btn-secondary" style="width: 40%;" onclick="restart()">Prev.</button>
+      <button style="width: 60%;" onclick="addCss()">Save Overrides</button>
+    </div>
+  </div>
+
   <!-- CONFIRM -->
   <div id="step-confirm" class="hidden" style="text-align:center; padding-top:40px;">
     <div style="font-size:32px;">✅</div>
@@ -147,7 +179,8 @@
     let registry = [];
     let selectedIntents = [];
     let currentLinkType = 'URL';
-    let detectedFields = []; // Array of field name strings
+    let detectedFields = [];
+    let cssRowCount = 0;
 
     // --- Load motion registry ---
     fetch('https://raw.githubusercontent.com/StraxyCo/d2c-annotation-figma-plugin/main/data/motion-registry.json')
@@ -160,11 +193,8 @@
       if (!msg) return;
 
       if (msg.type === 'fields-detected') {
-        // Auto-fill label if still empty
         const labelInput = document.getElementById('data-label');
         if (!labelInput.value && msg.componentName) labelInput.value = msg.componentName;
-
-        // Merge detected fields (avoid duplicates)
         msg.fields.forEach(f => {
           if (!detectedFields.includes(f)) detectedFields.push(f);
         });
@@ -172,7 +202,7 @@
       }
     };
 
-    // --- Render field chips ---
+    // --- Field chips ---
     function renderFieldChips() {
       const container = document.getElementById('fields-display');
       if (detectedFields.length === 0) {
@@ -216,6 +246,43 @@
       showFlow('confirm');
     }
 
+    // --- CSS Override ---
+    function addCssRow(prop = '', val = '') {
+      const id = cssRowCount++;
+      const container = document.getElementById('css-rows-container');
+      const row = document.createElement('div');
+      row.className = 'css-row';
+      row.id = `css-row-${id}`;
+      row.innerHTML = `
+        <input type="text" placeholder="property" value="${prop}" class="css-prop" style="flex:1.2;">
+        <span class="sep">:</span>
+        <input type="text" placeholder="value" value="${val}" class="css-val" style="flex:1.8;">
+        <span class="remove-css" onclick="removeCssRow(${id})">×</span>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeCssRow(id) {
+      const row = document.getElementById(`css-row-${id}`);
+      if (row) row.remove();
+    }
+
+    function addCss() {
+      const rows = document.querySelectorAll('#css-rows-container .css-row');
+      const rules = {};
+      rows.forEach(row => {
+        const prop = row.querySelector('.css-prop').value.trim();
+        const val  = row.querySelector('.css-val').value.trim();
+        if (prop && val) rules[prop] = val;
+      });
+      if (Object.keys(rules).length === 0) {
+        alert('Ajoute au moins une propriété CSS valide.');
+        return;
+      }
+      parent.postMessage({ pluginMessage: { type: 'add-css', data: { rules } } }, '*');
+      showFlow('confirm');
+    }
+
     // --- Motion grid ---
     function renderGrid() {
       const grid = document.getElementById('motion-grid');
@@ -246,12 +313,16 @@
     // --- Flow navigation ---
     function showFlow(flow) {
       document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
-      if (flow === 'motion')    document.getElementById('flow-motion-1').classList.remove('hidden');
-      if (flow === 'motion-2')  document.getElementById('flow-motion-2').classList.remove('hidden');
-      if (flow === 'link')      document.getElementById('flow-link').classList.remove('hidden');
-      if (flow === 'data')      document.getElementById('flow-data').classList.remove('hidden');
-      if (flow === 'confirm')   document.getElementById('step-confirm').classList.remove('hidden');
-      if (flow === '0')         document.getElementById('step-0').classList.remove('hidden');
+      if (flow === 'motion')   document.getElementById('flow-motion-1').classList.remove('hidden');
+      if (flow === 'motion-2') document.getElementById('flow-motion-2').classList.remove('hidden');
+      if (flow === 'link')     document.getElementById('flow-link').classList.remove('hidden');
+      if (flow === 'data')     document.getElementById('flow-data').classList.remove('hidden');
+      if (flow === 'confirm')  document.getElementById('step-confirm').classList.remove('hidden');
+      if (flow === '0')        document.getElementById('step-0').classList.remove('hidden');
+      if (flow === 'css') {
+        document.getElementById('flow-css').classList.remove('hidden');
+        if (document.querySelectorAll('#css-rows-container .css-row').length === 0) addCssRow();
+      }
     }
 
     function setLinkType(type) {
@@ -294,6 +365,8 @@
       document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
       renderFieldChips();
       document.getElementById('btn-next').disabled = true;
+      document.getElementById('css-rows-container').innerHTML = '';
+      cssRowCount = 0;
       showFlow('0');
     }
   </script>
